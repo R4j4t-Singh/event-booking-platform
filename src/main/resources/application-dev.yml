@@ -12,3 +12,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+logging:
+    level:
+      com.example.event_booking_platform: debug
+
+jwt:
+  secret: supersecretkey12345678904545444589
+  expiration: 3600000
