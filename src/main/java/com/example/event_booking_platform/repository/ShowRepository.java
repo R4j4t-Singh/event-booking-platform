@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ShowRepository extends JpaRepository<Show, Long> {
-    List<Show> findByEvent(Event event);
+    List<Show> findAllByEvent(Event event);
 }
