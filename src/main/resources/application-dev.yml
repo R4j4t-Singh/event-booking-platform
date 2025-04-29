@@ -12,6 +12,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  data:
+    redis:
+      host: redis-18758.c305.ap-south-1-1.ec2.redns.redis-cloud.com
+      port: 18758
+      password: cdKSpQcJq8dJJsFo3QJsW8FFbK31c8nl
 
 logging:
     level:
