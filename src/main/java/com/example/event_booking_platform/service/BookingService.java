@@ -81,4 +81,12 @@ public class BookingService {
             });
         }
     }
+
+    public List<Booking> getBookings() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        Long userId = principal.getId();
+
+        return bookingRepository.findAllByUserId(userId);
+    }
 }
