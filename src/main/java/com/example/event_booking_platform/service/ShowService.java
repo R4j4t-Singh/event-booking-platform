@@ -1,6 +1,7 @@
 package com.example.event_booking_platform.service;
 
 import com.example.event_booking_platform.dto.CreateShowRequest;
+import com.example.event_booking_platform.dto.ShowResponse;
 import com.example.event_booking_platform.entity.Event;
 import com.example.event_booking_platform.entity.Seat;
 import com.example.event_booking_platform.entity.SeatStatus;
@@ -29,7 +30,7 @@ public class ShowService {
     private SeatRepository seatRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public Show addShow(CreateShowRequest request) throws EventNotFoundException {
+    public ShowResponse addShow(CreateShowRequest request) throws EventNotFoundException {
         Event event = eventRepository.findById(request.getEventId()).orElseThrow(() -> new EventNotFoundException("Event does not exist with this id"));
 
         Show show = Show.builder()
@@ -44,7 +45,7 @@ public class ShowService {
         List<Seat> seats = generateSeats(savedShow, request.getTotalSeats());
         seats.forEach((seat) -> seatRepository.save(seat));
 
-        return savedShow;
+        return getShowResponse(savedShow);
     }
 
     public List<Seat> generateSeats(Show savedShow, Integer totalSeats ) {
@@ -61,12 +62,22 @@ public class ShowService {
         return seats;
     }
 
-    public List<Show> getShows(Long eventId) throws EventNotFoundException {
+    public List<ShowResponse> getShows(Long eventId) throws EventNotFoundException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event does not exist with this id"));
-        return showRepository.findAllByEvent(event);
+        List<Show> shows = showRepository.findAllByEvent(event);
+        return shows.stream().map(this::getShowResponse).toList();
     }
 
     public void removeShow(Long id) {
         showRepository.deleteById(id);
+    }
+
+    public ShowResponse getShowResponse(Show show) {
+        return ShowResponse.builder()
+                .id(show.getId())
+                .venue(show.getVenue())
+                .startTime(show.getStartTime())
+                .endTime(show.getEndTime())
+                .build();
     }
 }

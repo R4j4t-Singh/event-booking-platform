@@ -1,6 +1,7 @@
 package com.example.event_booking_platform.controller;
 
 import com.example.event_booking_platform.dto.CreateShowRequest;
+import com.example.event_booking_platform.dto.ShowResponse;
 import com.example.event_booking_platform.entity.Event;
 import com.example.event_booking_platform.entity.Show;
 import com.example.event_booking_platform.service.EventService;
@@ -38,10 +39,10 @@ public class AdminController {
 
 
     @PostMapping("/shows")
-    public ResponseEntity<Show> addShow(@RequestBody CreateShowRequest request) {
+    public ResponseEntity<ShowResponse> addShow(@RequestBody CreateShowRequest request) {
         try {
             log.debug(request.toString());
-            Show show = showService.addShow(request);
+            ShowResponse show = showService.addShow(request);
             return new ResponseEntity<>(show, HttpStatus.CREATED);
         } catch(Exception e) {
             log.error(e.getMessage());
