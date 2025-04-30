@@ -1,6 +1,6 @@
 package com.example.event_booking_platform.controller;
 
-import com.example.event_booking_platform.entity.Seat;
+import com.example.event_booking_platform.dto.SeatResponse;
 import com.example.event_booking_platform.service.SeatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class PublicSeatController {
     @GetMapping("/show/{showId}")
     public ResponseEntity<?> getSeats(@PathVariable Long showId) {
         try {
-            List<Seat> seats = seatService.getSeats(showId);
+            List<SeatResponse> seats = seatService.getSeats(showId);
             return new ResponseEntity<>(seats, HttpStatus.OK);
         }catch (Exception e) {
             log.error(e.getMessage());
