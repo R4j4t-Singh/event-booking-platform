@@ -1,6 +1,7 @@
 package com.example.event_booking_platform.service;
 
 import com.example.event_booking_platform.dto.BookingRequest;
+import com.example.event_booking_platform.dto.BookingResponse;
 import com.example.event_booking_platform.entity.*;
 import com.example.event_booking_platform.exception.SeatUnavailableException;
 import com.example.event_booking_platform.exception.SeatsLockedException;
@@ -34,7 +35,7 @@ public class BookingService {
     private LockService lockService;
 
     @Transactional
-    public Booking bookSeats(BookingRequest request) throws ShowNotFoundException, SeatUnavailableException, SeatsLockedException {
+    public BookingResponse bookSeats(BookingRequest request) throws ShowNotFoundException, SeatUnavailableException, SeatsLockedException {
 
         String lockOwner = UUID.randomUUID().toString();
         List<String> lockedSeats = new ArrayList<>();
@@ -74,7 +75,8 @@ public class BookingService {
                     .status("CONFIRMED")
                     .build();
 
-            return bookingRepository.save(booking);
+            Booking savedBooking = bookingRepository.save(booking);
+            return getBookingResponse(savedBooking);
         } finally {
             lockedSeats.forEach((lockKey) -> {
                 lockService.releaseLock(lockKey, lockOwner);
@@ -82,11 +84,22 @@ public class BookingService {
         }
     }
 
-    public List<Booking> getBookings() {
+    public List<BookingResponse> getBookings() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
         Long userId = principal.getId();
 
-        return bookingRepository.findAllByUserId(userId);
+        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
+        return bookings.stream().map((this::getBookingResponse)).toList();
+    }
+
+    public BookingResponse getBookingResponse(Booking booking) {
+        return BookingResponse.builder()
+                .id(booking.getId())
+                .showId(booking.getShow().getId())
+                .bookingTime(booking.getBookingTime())
+                .seats(booking.getSeats().stream().map(Seat::getId).toList())
+                .status(booking.getStatus())
+                .build();
     }
 }

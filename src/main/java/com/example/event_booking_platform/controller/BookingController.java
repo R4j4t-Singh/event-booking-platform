@@ -1,6 +1,7 @@
 package com.example.event_booking_platform.controller;
 
 import com.example.event_booking_platform.dto.BookingRequest;
+import com.example.event_booking_platform.dto.BookingResponse;
 import com.example.event_booking_platform.entity.Booking;
 import com.example.event_booking_platform.service.BookingService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<?> bookSeats(@RequestBody BookingRequest request) {
         try {
-            Booking booking = bookingService.bookSeats(request);
+            BookingResponse booking = bookingService.bookSeats(request);
             return new ResponseEntity<>(booking, HttpStatus.OK);
         } catch(Exception e) {
             log.error(e.getMessage());
@@ -31,8 +32,8 @@ public class BookingController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<Booking>> getbookings() {
-        List<Booking> bookings = bookingService.getBookings();
+    public ResponseEntity<List<BookingResponse>> getBookings() {
+        List<BookingResponse> bookings = bookingService.getBookings();
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 }
