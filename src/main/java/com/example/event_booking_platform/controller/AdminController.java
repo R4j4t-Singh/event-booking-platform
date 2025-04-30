@@ -1,9 +1,9 @@
 package com.example.event_booking_platform.controller;
 
+import com.example.event_booking_platform.dto.CreateEventRequest;
 import com.example.event_booking_platform.dto.CreateShowRequest;
+import com.example.event_booking_platform.dto.EventResponse;
 import com.example.event_booking_platform.dto.ShowResponse;
-import com.example.event_booking_platform.entity.Event;
-import com.example.event_booking_platform.entity.Show;
 import com.example.event_booking_platform.service.EventService;
 import com.example.event_booking_platform.service.ShowService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,8 @@ public class AdminController {
     private ShowService showService;
 
     @PostMapping("/events")
-    public ResponseEntity<Event> addEvent(@RequestBody Event event) {
-        Event savedEvent = eventService.addEvent(event);
+    public ResponseEntity<EventResponse> addEvent(@RequestBody CreateEventRequest request) {
+        EventResponse savedEvent = eventService.addEvent(request);
         return new ResponseEntity<>(savedEvent, HttpStatus.CREATED);
     }
 

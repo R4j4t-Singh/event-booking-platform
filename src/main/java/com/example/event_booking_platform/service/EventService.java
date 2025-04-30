@@ -1,5 +1,7 @@
 package com.example.event_booking_platform.service;
 
+import com.example.event_booking_platform.dto.CreateEventRequest;
+import com.example.event_booking_platform.dto.EventResponse;
 import com.example.event_booking_platform.entity.Event;
 import com.example.event_booking_platform.entity.UserPrincipal;
 import com.example.event_booking_platform.exception.EventNotFoundException;
@@ -19,27 +21,49 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public List<Event> getEvents() {
-        return eventRepository.findAll();
+    public List<EventResponse> getEvents() {
+        List<Event> events = eventRepository.findAll();
+        return events.stream().map(this::getEventResponse).toList();
     }
 
-    public Event getEvent(Long id) throws EventNotFoundException {
-        return eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException("Event not found with this id"));
+    public EventResponse getEvent(Long id) throws EventNotFoundException {
+        Event event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException("Event not found with this id"));
+        return getEventResponse(event);
     }
 
-    public Event addEvent(Event event) {
+    public EventResponse addEvent(CreateEventRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         Long userId = userPrincipal.getId();
         log.debug("userID: {}", userId);
 
-        event.setCreatedBy(userId);
-        event.setCreatedAt(new Date(System.currentTimeMillis()));
+        Event event = Event.builder()
+                .title(request.getTitle())
+                .category(request.getCategory())
+                .description(request.getDescription())
+                .imageUrl(request.getImageUrl())
+                .createdBy(userId)
+                .createdAt(new Date(System.currentTimeMillis()))
+                .build();
+
         log.debug("created at: {}", event.getCreatedAt());
-        return eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
+        return getEventResponse(savedEvent);
     }
 
     public void removeEvent(Long id) {
         eventRepository.deleteById(id);
+    }
+
+    public EventResponse getEventResponse(Event event) {
+        return EventResponse.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .category(event.getCategory())
+                .imageUrl(event.getImageUrl())
+                .description(event.getDescription())
+                .createdBy(event.getCreatedBy())
+                .createdAt(event.getCreatedAt())
+                .build();
     }
 }

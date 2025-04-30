@@ -1,7 +1,7 @@
 package com.example.event_booking_platform.controller;
 
+import com.example.event_booking_platform.dto.EventResponse;
 import com.example.event_booking_platform.dto.ShowResponse;
-import com.example.event_booking_platform.entity.Event;
 import com.example.event_booking_platform.service.EventService;
 import com.example.event_booking_platform.service.ShowService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +23,15 @@ public class PublicController {
     private ShowService showService;
 
     @GetMapping
-    public ResponseEntity<List<Event>> getEvents() {
-        List<Event> events = eventService.getEvents();
+    public ResponseEntity<List<EventResponse>> getEvents() {
+        List<EventResponse> events = eventService.getEvents();
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEvent(@PathVariable Long id) {
+    public ResponseEntity<EventResponse> getEvent(@PathVariable Long id) {
         try {
-            Event event = eventService.getEvent(id);
+            EventResponse event = eventService.getEvent(id);
             return new ResponseEntity<>(event, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
