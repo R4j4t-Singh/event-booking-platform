@@ -6,6 +6,7 @@ import com.example.event_booking_platform.entity.*;
 import com.example.event_booking_platform.exception.SeatUnavailableException;
 import com.example.event_booking_platform.exception.SeatsLockedException;
 import com.example.event_booking_platform.exception.ShowNotFoundException;
+import com.example.event_booking_platform.dto.BookingEmailData;
 import com.example.event_booking_platform.repository.BookingRepository;
 import com.example.event_booking_platform.repository.SeatRepository;
 import com.example.event_booking_platform.repository.ShowRepository;
@@ -33,6 +34,9 @@ public class BookingService {
 
     @Autowired
     private LockService lockService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public BookingResponse bookSeats(BookingRequest request) throws ShowNotFoundException, SeatUnavailableException, SeatsLockedException {
@@ -66,6 +70,7 @@ public class BookingService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             Long userId = userPrincipal.getId();
+            String userEmail = userPrincipal.getUsername();
 
             Booking booking = Booking.builder()
                     .show(show)
@@ -76,6 +81,7 @@ public class BookingService {
                     .build();
 
             Booking savedBooking = bookingRepository.save(booking);
+            sendBookingEmail(booking, userEmail);
             return getBookingResponse(savedBooking);
         } finally {
             lockedSeats.forEach((lockKey) -> {
@@ -101,5 +107,18 @@ public class BookingService {
                 .seats(booking.getSeats().stream().map(Seat::getId).toList())
                 .status(booking.getStatus())
                 .build();
+    }
+
+    public void sendBookingEmail(Booking booking, String email) {
+        BookingEmailData emailData = BookingEmailData.builder()
+                .email(email)
+                .seatNumbers(booking.getSeats().stream().map(Seat::getSeatNumber).toList())
+                .venue(booking.getShow().getVenue())
+                .event(booking.getShow().getEvent().getTitle())
+                .startTime(booking.getShow().getStartTime())
+                .endTime(booking.getShow().getEndTime())
+                .build();
+
+        emailService.sendBookingEmail(emailData);
     }
 }
