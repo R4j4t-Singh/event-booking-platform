@@ -3,6 +3,7 @@ package com.example.event_booking_platform.service;
 import com.example.event_booking_platform.dto.BookingEmailData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,12 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @KafkaListener(topics = "email", groupId = "consumer-email-group")
+    public void bookingEmailConsumer(BookingEmailData emailData) {
+        log.debug("Kafka : Consuming -> {}", emailData);
+        sendBookingEmail(emailData);
+    }
 
     public void sendBookingEmail(BookingEmailData emailData) {
         if(emailData != null) {

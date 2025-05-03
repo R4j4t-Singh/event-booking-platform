@@ -11,6 +11,7 @@ import com.example.event_booking_platform.repository.BookingRepository;
 import com.example.event_booking_platform.repository.SeatRepository;
 import com.example.event_booking_platform.repository.ShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class BookingService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private KafkaTemplate<String, BookingEmailData> kafkaTemplate;
 
     @Transactional
     public BookingResponse bookSeats(BookingRequest request) throws ShowNotFoundException, SeatUnavailableException, SeatsLockedException {
@@ -119,6 +123,7 @@ public class BookingService {
                 .endTime(booking.getShow().getEndTime())
                 .build();
 
-        emailService.sendBookingEmail(emailData);
+//        emailService.sendBookingEmail(emailData);
+        kafkaTemplate.send("email", emailData);
     }
 }
