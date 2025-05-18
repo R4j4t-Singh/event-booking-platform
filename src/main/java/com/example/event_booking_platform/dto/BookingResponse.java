@@ -10,8 +10,11 @@ import java.util.List;
 @Builder
 public class BookingResponse {
     private Long id;
-    private Long showId;
+    private String event;
+    private String venue;
+    private Date startTime;
+    private Date endTime;
     private Date bookingTime;
-    private List<Long> seats;
+    private List<String> seats;
     private String status;
 }

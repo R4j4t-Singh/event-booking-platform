@@ -106,9 +106,12 @@ public class BookingService {
     public BookingResponse getBookingResponse(Booking booking) {
         return BookingResponse.builder()
                 .id(booking.getId())
-                .showId(booking.getShow().getId())
+                .venue(booking.getShow().getVenue())
+                .event(booking.getShow().getEvent().getTitle())
+                .startTime(booking.getShow().getStartTime())
+                .endTime(booking.getShow().getEndTime())
                 .bookingTime(booking.getBookingTime())
-                .seats(booking.getSeats().stream().map(Seat::getId).toList())
+                .seats(booking.getSeats().stream().map(Seat::getSeatNumber).toList())
                 .status(booking.getStatus())
                 .build();
     }
